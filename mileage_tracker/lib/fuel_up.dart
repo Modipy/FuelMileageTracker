@@ -1,12 +1,11 @@
-import 'package:mileage_tracker/vehicle.dart';
 
-class Logbook {
+class FuelUp {
   
   DateTime dateFilled = DateTime.now();
   double amountOfFuel = 0;
   double moneySpent = 0;
-  Vehicle vehicleFilled = Vehicle();
+  String vehicleFilled = "VehicleId";
 
-  Logbook(this.amountOfFuel, this.dateFilled, this.vehicleFilled);
+  FuelUp(this.amountOfFuel, this.dateFilled, this.vehicleFilled);
 
 }
