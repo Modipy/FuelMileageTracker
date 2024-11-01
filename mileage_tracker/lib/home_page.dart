@@ -1,5 +1,6 @@
 
 import 'package:flutter/material.dart';
+import 'package:mileage_tracker/drawer_item.dart';
 import 'package:mileage_tracker/mileage_model.dart';
 class HomePage extends StatefulWidget {
   const HomePage({super.key, required this.mileageModel});
@@ -11,16 +12,18 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  List<String> drawerChoices = ['Mileage', 'Vehicles', 'Logbook', 'Statistics', 'Account', 'Settings']; // choices for sorting
-  static const List<Widget> _drawerWidgetOptions = <Widget>[Text('Mileage'), Text('Vehicles'), Text('Logbook'), Text('Statisctics'), Text('Account'), Text('Settings')];
-  int _drawerSelectedIndex = 0;
-
-
-  // Icons.local_gas_station_rounded
-  // Icons.directions_car_filled_rounded
-  // menu_book_rounded
-  //
-  // mileage page, vehicles page, logbook, stats page, account page, settings page
+  
+  // Current index of selected drawer item
+  int _selectedIndex = 0;
+  // List of items for the drawer
+  static final List<DrawerItem> _drawerItems = [
+    DrawerItem('Home', const Icon(Icons.home), 0),
+    DrawerItem('Logbook', const Icon(Icons.menu_book_rounded), 1),
+    DrawerItem('Statistcs', const Icon(Icons.analytics_rounded), 2),
+    DrawerItem('Vehicles', const Icon(Icons.directions_car_filled_rounded), 3),
+    DrawerItem('Account', const Icon(Icons.account_circle_rounded), 4),
+    DrawerItem('Settings', const Icon(Icons.settings), 5)
+  ];
 
 
   @override
@@ -38,7 +41,7 @@ class _HomePageState extends State<HomePage> {
               );
             },
           ),
-          actions: const <Widget>[
+          actions: <Widget>[
             // Flexible(
             //   child: DropdownButton(
             //     iconDisabledColor:
@@ -60,49 +63,57 @@ class _HomePageState extends State<HomePage> {
             //   ),
             // ),
 
-            // IconButton(
-            //   onPressed: _addFuelMileage,
-            //   icon: (dropdownChoices[_selectedIndex] != "Logbook") ? const Icon(Icons.add) : Container(),
-            // )
+            IconButton(
+              onPressed: _addFuelMileage,
+              icon: (_addButtonIsAvailable(_drawerItems[_selectedIndex])) ? const Icon(Icons.add) : Container(),
+            )
           ],
           backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-          title: Text(drawerChoices[_drawerSelectedIndex]),
+          title: _drawerItems[_selectedIndex].getNameAsText(),
           centerTitle: true,
         ),
         body: Center(
-          child: _drawerWidgetOptions[_drawerSelectedIndex],
+          child: _drawerItems[_selectedIndex].getNameAsText()
         ),
         drawer: Drawer(
           child: ListView(
             padding: EdgeInsets.zero, // Important: Remove any padding from the ListView.
             children: [
               DrawerHeader(
-                decoration: const BoxDecoration(
-                  color: Colors.green,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primaryContainer,
                 ),
-                child: Text(drawerChoices[_drawerSelectedIndex]),
+                child: _drawerItems[_selectedIndex].getNameAsText()
               ),
-              drawerTile(context, drawerChoices[0], 0),
-              drawerTile(context, drawerChoices[1], 1),
-              drawerTile(context, drawerChoices[2], 2),
-              drawerTile(context, drawerChoices[3], 3),
-              drawerTile(context, drawerChoices[4], 4),
-              drawerTile(context, drawerChoices[5], 5),
+              drawerTile(context, _drawerItems[0]),
+              drawerTile(context, _drawerItems[1]),
+              drawerTile(context, _drawerItems[2]),
+              drawerTile(context, _drawerItems[3]),
+              drawerTile(context, _drawerItems[4]),
+              drawerTile(context, _drawerItems[5]),
             ],
           ),
         ));
   }
 
-  ListTile drawerTile(BuildContext context, String drawerChoice, int index) {
+  ListTile drawerTile(BuildContext context, DrawerItem drawerItem) {    
     return ListTile(
-      title: Text(drawerChoice),
-      selected: _drawerSelectedIndex == index,
+      leading: drawerItem.getIcon(),
+      title: drawerItem.getNameAsText(),
+      selected: _selectedIndex == drawerItem.getIndex(),
       onTap: () {
-        setState(() { _drawerSelectedIndex = index; }); // Update the state of the app
+        setState(() { _selectedIndex = drawerItem.getIndex(); }); // Update the state of the app
         Navigator.pop(context); // Then close the drawer
       },
     );
   }
 
   void _addFuelMileage() {}
+
+  bool _addButtonIsAvailable(DrawerItem drawerItem) {
+    if (drawerItem.getName() == "Home") { return true; }
+    if (drawerItem.getName() == "Logbook") { return true; }
+    if (drawerItem.getName() == "Vehicles") { return true; }
+    return false;
+  }
 }
