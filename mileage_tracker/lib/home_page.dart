@@ -1,7 +1,8 @@
-
 import 'package:flutter/material.dart';
 import 'package:mileage_tracker/drawer_item.dart';
 import 'package:mileage_tracker/mileage_model.dart';
+import 'package:mileage_tracker/vehicle.dart';
+
 class HomePage extends StatefulWidget {
   const HomePage({super.key, required this.mileageModel});
 
@@ -12,9 +13,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  
   // Current index of selected drawer item
-  int _selectedIndex = 0;
+  int _drawerSelectedIndex = 0;
   // List of items for the drawer
   static final List<DrawerItem> _drawerItems = [
     DrawerItem('Home', const Icon(Icons.home), 0),
@@ -25,6 +25,8 @@ class _HomePageState extends State<HomePage> {
     DrawerItem('Settings', const Icon(Icons.settings), 5)
   ];
 
+  //List<Widget> pageList = [homePageBody(context, widget.mileageModel.vehicleList.getBasicInfoAsString())];
+  String? dropDownValue;
 
   @override
   Widget build(BuildContext context) {
@@ -37,54 +39,37 @@ class _HomePageState extends State<HomePage> {
                 onPressed: () {
                   Scaffold.of(context).openDrawer();
                 },
-                icon: const Icon(Icons.menu/*Icons.density_medium_rounded*/),
+                icon: const Icon(Icons.menu /*Icons.density_medium_rounded*/),
               );
             },
           ),
           actions: <Widget>[
-            // Flexible(
-            //   child: DropdownButton(
-            //     iconDisabledColor:
-            //         Theme.of(context).colorScheme.primaryContainer,
-            //     iconEnabledColor:
-            //         Theme.of(context).colorScheme.primaryContainer,
-            //     value: selectedChoice,
-            //     underline: Container(),
-            //     style: TextStyle(color: Theme.of(context).colorScheme.primary),
-            //     icon: const Icon(Icons.density_medium_rounded),
-            //     items: dropdownChoices.map((String items) {
-            //       return DropdownMenuItem(value: items, child: Text(items));
-            //     }).toList(),
-            //     onChanged: (String? newValue) {
-            //       setState(() {
-            //         selectedChoice = newValue!;
-            //       });
-            //     },
-            //   ),
-            // ),
-
             IconButton(
               onPressed: _addFuelMileage,
-              icon: (_addButtonIsAvailable(_drawerItems[_selectedIndex])) ? const Icon(Icons.add) : Container(),
+              icon: (_addButtonIsAvailable(_drawerItems[_drawerSelectedIndex]))
+                  ? const Icon(Icons.add)
+                  : Container(),
             )
           ],
           backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-          title: _drawerItems[_selectedIndex].getNameAsText(),
+          title: _drawerItems[_drawerSelectedIndex].getNameAsText(),
           centerTitle: true,
         ),
-        body: Center(
-          child: _drawerItems[_selectedIndex].getNameAsText()
-        ),
+        body: homePageBody(
+            context,
+            widget.mileageModel
+                .getBasicVehicleInfoAsString()), //Center(child: _drawerItems[_selectedIndex].getNameAsText()),
+        // might have to make a function that returns a widget based on the _drawerSelectedIndex
         drawer: Drawer(
           child: ListView(
-            padding: EdgeInsets.zero, // Important: Remove any padding from the ListView.
+            padding: EdgeInsets
+                .zero, // Important: Remove any padding from the ListView.
             children: [
               DrawerHeader(
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primaryContainer,
-                ),
-                child: _drawerItems[_selectedIndex].getNameAsText()
-              ),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.primaryContainer,
+                  ),
+                  child: _drawerItems[_drawerSelectedIndex].getNameAsText()),
               drawerTile(context, _drawerItems[0]),
               drawerTile(context, _drawerItems[1]),
               drawerTile(context, _drawerItems[2]),
@@ -96,24 +81,72 @@ class _HomePageState extends State<HomePage> {
         ));
   }
 
-  ListTile drawerTile(BuildContext context, DrawerItem drawerItem) {    
+  ListTile drawerTile(BuildContext context, DrawerItem drawerItem) {
     return ListTile(
       leading: drawerItem.getIcon(),
       title: drawerItem.getNameAsText(),
-      selected: _selectedIndex == drawerItem.getIndex(),
+      selected: _drawerSelectedIndex == drawerItem.getIndex(),
       onTap: () {
-        setState(() { _selectedIndex = drawerItem.getIndex(); }); // Update the state of the app
+        setState(() {
+          _drawerSelectedIndex = drawerItem.getIndex();
+        }); // Update the state of the app
         Navigator.pop(context); // Then close the drawer
       },
+    );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    // Initialize dropDownValue with a default value, if desired
+    dropDownValue = widget.mileageModel.getBasicVehicleInfoAsString().first;
+  }
+
+  Column homePageBody(BuildContext context, List<String?> vehicleList) {
+    //String? dropDownValue = vehicleList[0];
+
+    return Column(
+      children: [
+        Row(
+          children: [
+            const Text("Current Vehicle"),
+            DropdownButton(
+              hint: Text(dropDownValue!),
+              iconSize: 30.0,
+              items: vehicleList.map(
+                (val) {
+                  return DropdownMenuItem<String>(
+                    value: val,
+                    child: Text(val!),
+                  );
+                },
+              ).toList(),
+              onChanged: (val) {
+                setState(
+                  () {
+                    dropDownValue = val;
+                  },
+                );
+              },
+            ),
+          ],
+        )
+      ],
     );
   }
 
   void _addFuelMileage() {}
 
   bool _addButtonIsAvailable(DrawerItem drawerItem) {
-    if (drawerItem.getName() == "Home") { return true; }
-    if (drawerItem.getName() == "Logbook") { return true; }
-    if (drawerItem.getName() == "Vehicles") { return true; }
+    if (drawerItem.getName() == "Home") {
+      return true;
+    }
+    if (drawerItem.getName() == "Logbook") {
+      return true;
+    }
+    if (drawerItem.getName() == "Vehicles") {
+      return true;
+    }
     return false;
   }
 }

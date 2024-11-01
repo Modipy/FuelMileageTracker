@@ -10,6 +10,10 @@ class Vehicle {
   
   Vehicle([this.year, this.make, this.model, this.vehicleType, this.mileage]); // Constructor for a vehicle
 
+  String? getBasicInfoAsString() {
+    return "$year $make $model";
+  }
+
 
   void updateVehicleMileage(double newMileage) {
     mileage = newMileage;
