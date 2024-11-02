@@ -67,8 +67,7 @@ class _HomePageState extends State<HomePage> {
             children: [
               DrawerHeader(
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.primaryContainer,
-                  ),
+                      color: Theme.of(context).colorScheme.primaryContainer),
                   child: _drawerItems[_drawerSelectedIndex].getNameAsText()),
               drawerTile(context, _drawerItems[0]),
               drawerTile(context, _drawerItems[1]),
@@ -107,35 +106,44 @@ class _HomePageState extends State<HomePage> {
 
     return Column(
       children: [
-        Row(
-          children: [
-            const Text("Current Vehicle"),
-            DropdownButton(
-              hint: Text(dropDownValue!),
-              iconSize: 30.0,
-              items: vehicleList.map(
-                (val) {
-                  return DropdownMenuItem<String>(
-                    value: val,
-                    child: Text(val!),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text("Current Vehicle: "),
+              DropdownButton(
+                hint: Text(dropDownValue!),
+                iconSize: 30.0,
+                items: vehicleList.map(
+                  (val) {
+                    return DropdownMenuItem<String>(
+                      value: val,
+                      child: Text(val!),
+                    );
+                  },
+                ).toList(),
+                onChanged: (val) {
+                  setState(
+                    () {
+                      dropDownValue = val;
+                    },
                   );
                 },
-              ).toList(),
-              onChanged: (val) {
-                setState(
-                  () {
-                    dropDownValue = val;
-                  },
-                );
-              },
-            ),
-          ],
+              ),
+              // TextButton(
+              //     onPressed: _addNewFuelUp,
+              //     child: const Text("Add New Fuel Up"))
+            ],
+          ),
         )
       ],
     );
   }
 
   void _addFuelMileage() {}
+
+  void _addNewFuelUp() {}
 
   bool _addButtonIsAvailable(DrawerItem drawerItem) {
     if (drawerItem.getName() == "Home") {
