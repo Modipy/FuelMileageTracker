@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mileage_tracker/drawer_item.dart';
 import 'package:mileage_tracker/mileage_model.dart';
+import 'package:mileage_tracker/new_fuel_up_page.dart';
 import 'package:mileage_tracker/vehicle.dart';
 
 class HomePage extends StatefulWidget {
@@ -48,7 +49,7 @@ class _HomePageState extends State<HomePage> {
               onPressed: _addFuelMileage,
               icon: (_addButtonIsAvailable(_drawerItems[_drawerSelectedIndex]))
                   ? const Icon(Icons.add)
-                  : Container(),
+                  : Container(), // change this so that no button is actually there
             )
           ],
           backgroundColor: Theme.of(context).colorScheme.inversePrimary,
@@ -56,9 +57,8 @@ class _HomePageState extends State<HomePage> {
           centerTitle: true,
         ),
         body: homePageBody(
-            context,
-            widget.mileageModel
-                .getBasicVehicleInfoAsString()), //Center(child: _drawerItems[_selectedIndex].getNameAsText()),
+            context, widget.mileageModel.getBasicVehicleInfoAsString()),
+        //Center(child: _drawerItems[_selectedIndex].getNameAsText()),
         // might have to make a function that returns a widget based on the _drawerSelectedIndex
         drawer: Drawer(
           child: ListView(
@@ -131,12 +131,19 @@ class _HomePageState extends State<HomePage> {
                   );
                 },
               ),
-              // TextButton(
-              //     onPressed: _addNewFuelUp,
-              //     child: const Text("Add New Fuel Up"))
             ],
           ),
-        )
+        ),
+        ElevatedButton(
+            onPressed: () {
+              print("We got here");
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => NewFuelUpPage()),
+              );
+              print("Here after the navigate");
+            },
+            child: const Text("Add New Fuel Up"))
       ],
     );
   }
